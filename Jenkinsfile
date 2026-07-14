@@ -15,9 +15,9 @@ node {
         stage('Install Dependencies') {
             echo "Install python dependencies...."
             if (isUnix()) {
-                sh 'python3 pip install -r requirements.txt'
+                sh 'python3 -m pip install -r requirements.txt'
             } else {
-                bat 'python pip install -r requirements.txt'
+                bat 'python -m pip install -r requirements.txt'
             }
         }
         stage('Run Application') {
@@ -40,8 +40,8 @@ node {
             echo "Application Build and Test completed successfully"
         }
 
-    } catch (exception e) {
-        echo "An error occured: ${e.getMessage()}"
+    } catch (Exception e) {
+        echo "An error occurred: ${e.getMessage()}"
         currentBuild.result = 'FAILURE'
     }
     finally {
