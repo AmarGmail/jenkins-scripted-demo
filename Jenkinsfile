@@ -17,15 +17,17 @@ node {
         stage('Create python virtual environment') {
             echo "Createing python venv..."
             if (isUnix()) {
-                sh '''
-                python3 -m venv venv
-                ./venv/bin/python -m pip install --upgrade pip
-                '''
+                //sh '''
+                //python3 -m venv venv
+                //./venv/bin/python -m pip install --upgrade pip
+                //'''
+                sh 'python3 -m venv venv'
             } else {
-                bat '''
-                python -m venv venv
-                .\\venv\\Scripts\\python.exe -m pip install --upgrade pip
-                '''
+                //bat '''
+                //python -m venv venv
+                //.\\venv\\Scripts\\python.exe -m pip install --upgrade pip
+                //'''
+                bat 'python -m venv venv'
             }
         }
         stage('Install Dependencies') {
