@@ -5,6 +5,15 @@ node {
         stage('Checkout') {
             echo "Checking out the code .."
             checkout scm
+
+            githubNotify(
+                credentialsId: 'github-pat',
+                account: 'AmarGmail',
+                repo: 'jenkins-scripted-demo',
+                status: 'PENDING',
+                description: "Build #${env.BUILD_NUMBER} started",
+                context: 'ci/jenkins'
+            )
         }
         stage('Show Files') {
             echo "Displaying the files..."
@@ -59,11 +68,30 @@ node {
         }
         stage('Build Result') {
             echo "Application Build and Test completed successfully"
+
+            githubNotify(
+                credentialsId: 'github-pat',
+                account: 'AmarGmail',
+                repo: 'jenkins-scripted-demo',
+                status: 'SUCCESS',
+                description: "Build #${env.BUILD_NUMBER} passed",
+                context: 'ci/jenkins'
+            )
         }
 
     } catch (Exception e) {
         echo "An error occurred: ${e.getMessage()}"
         currentBuild.result = 'FAILURE'
+        githubNotify(
+            credentialsId: 'github-pat',
+            account: 'AmarGmail',
+            repo: 'jenkins-scripted-demo',
+            status: 'FAILURE',
+            description: "Build #${env.BUILD_NUMBER} failed",
+            context: 'ci/jenkins'
+        )
+
+throw e
     }
     finally {
         echo "Cleaning the workspace...."
