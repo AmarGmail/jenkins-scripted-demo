@@ -4,36 +4,50 @@ node {
             echo "Checking out the code .."
             checkout scm
         }
-        stage('show files') {
+        stage('Show Files') {
             echo "Displaying the files..."
             if(isUnix()) {
                 sh 'ls -l'
             } else {
                 bat 'dir'
             }
+        }   
+        stage('Create python virtual environment') {
+            echo "Createing python venv..."
+            if (isUnix()) {
+                sh '''
+                python3 -m venv venv
+                ./venv/bin/python -m pip install --upgrade pip
+                '''
+            } else {
+                bat '''
+                python -m venv venv
+                .\\venv\\Scripts\\python.exe -m pip install --upgrade pip
+                '''
+            }
         }
         stage('Install Dependencies') {
             echo "Install python dependencies...."
             if (isUnix()) {
-                sh 'python3 -m pip install -r requirements.txt'
+                sh './venv/bin/python -m pip install -r requirements.txt'
             } else {
-                bat 'python -m pip install -r requirements.txt'
+                bat '.\\venv\\Scripts\\python.exe -m pip install -r requirements.txt'
             }
         }
         stage('Run Application') {
             echo "Running the Python Application"
             if (isUnix()) {
-                sh 'python3 app.py'
+                sh './venv/bin/python app.py'
             } else {
-                bat 'python app.py'
+                bat '.\\venv\\Scripts\\python.exe app.py'
             }
         }
         stage('Run Test Cases') {
             echo "Running the Automated Test..."
             if (isUnix()) {
-                sh 'pytest -v'
+                sh './venv/bin/pytest -v'
             } else {
-                bat 'pytest -v'
+                bat '.\\venv\\Scripts\\pytest -v'
             }
         }
         stage('Build Result') {
