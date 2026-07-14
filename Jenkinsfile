@@ -31,7 +31,7 @@ node {
             }
         }
         stage('Install Dependencies') {
-            echo "Install python dependencies...."
+            echo "Install Python Dependencies...."
             if (isUnix()) {
                 sh './venv/bin/python -m pip install -r requirements.txt'
             } else {
