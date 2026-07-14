@@ -5,12 +5,15 @@ node {
         stage('Checkout') {
             echo "Checking out the code .."
             checkout scm
+            echo "GIT_COMMIT = ${env.GIT_COMMIT}"
+            echo "GIT_BRANCH = ${env.GIT_BRANCH}"
 
             githubNotify(
                 credentialsId: 'github-pat',
                 account: 'AmarGmail',
                 repo: 'jenkins-scripted-demo',
                 status: 'PENDING',
+                sha: env.GIT_COMMIT,
                 description: "Build #${env.BUILD_NUMBER} started",
                 context: 'ci/jenkins'
             )
@@ -74,6 +77,7 @@ node {
                 account: 'AmarGmail',
                 repo: 'jenkins-scripted-demo',
                 status: 'SUCCESS',
+                sha: env.GIT_COMMIT,
                 description: "Build #${env.BUILD_NUMBER} passed",
                 context: 'ci/jenkins'
             )
@@ -87,6 +91,7 @@ node {
             account: 'AmarGmail',
             repo: 'jenkins-scripted-demo',
             status: 'FAILURE',
+            sha: env.GIT_COMMIT,
             description: "Build #${env.BUILD_NUMBER} failed",
             context: 'ci/jenkins'
         )
