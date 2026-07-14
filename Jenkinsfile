@@ -5,7 +5,7 @@ node {
         stage('Checkout') {
             echo "Checking out the code .."
             def scmVars = checkout scm
-            echo "scmVars: ${scmVars}"
+            echo "scmVars:  ${scmVars}"
             //checkout scm
             echo "GIT_COMMIT = ${scmVars.GIT_COMMIT}"
             echo "GIT_BRANCH = ${scmVars.GIT_BRANCH}"
