@@ -1,3 +1,5 @@
+
+timestamps {
 node {
     try {
         stage('Checkout') {
@@ -45,10 +47,13 @@ node {
         stage('Run Test Cases') {
             echo "Running the Automated Test..."
             if (isUnix()) {
-                sh './venv/bin/pytest -v'
+                sh './venv/bin/pytest -v --junitxml=test-results.xml'
             } else {
-                bat '.\\venv\\Scripts\\pytest -v'
+                bat '.\\venv\\Scripts\\pytest -v --junitxml=test-results.xml'
             }
+        }
+        stage('Publish the Test Results'){
+            junit 'test-results.xml'
         }
         stage('Build Result') {
             echo "Application Build and Test completed successfully"
@@ -63,4 +68,5 @@ node {
         //cleanWs()
         deleteDir()
     }
+}
 }
