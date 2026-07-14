@@ -18,13 +18,29 @@ pipeline {
             }
         }
 
-        stage('Jenkins Environment') {
+        stage('Jenkins Variables') {
             steps {
                 script {
-                    echo "===== Jenkins Environment Variables ====="
+                    echo "===== Selected Jenkins Variables ====="
 
-                    env.getEnvironment().each { key, value ->
-                        echo "${key}=${value}"
+                    [
+                        'JOB_NAME',
+                        'JOB_BASE_NAME',
+                        'BUILD_NUMBER',
+                        'BUILD_ID',
+                        'BUILD_URL',
+                        'WORKSPACE',
+                        'NODE_NAME',
+                        'BRANCH_NAME',
+                        'CHANGE_ID',
+                        'CHANGE_BRANCH',
+                        'CHANGE_TARGET',
+                        'GIT_COMMIT',
+                        'GIT_BRANCH',
+                        'GIT_URL',
+                        'JENKINS_URL'
+                    ].each { key ->
+                        echo "${key} = ${env[key]}"
                     }
                 }
             }
