@@ -4,7 +4,7 @@ timestamps{
             stage('Checkout'){
                 echo "Checkout the Git code...."
                 checkout scm
-
+                echo "Git commit id: ${env.GIT_COMMIT}"
                 githubNotify(
                     credentialsId: 'github-pat',
                     status: 'PENDING',
