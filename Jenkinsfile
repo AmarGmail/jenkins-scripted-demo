@@ -7,15 +7,18 @@ node {
             def scmVars = checkout scm
             echo "scmVars:  ${scmVars}"
             //checkout scm
-            echo "GIT_COMMIT = ${scmVars.GIT_COMMIT}"
-            echo "GIT_BRANCH = ${scmVars.GIT_BRANCH}"
+            env.GIT_SHA = scmVars.GIT_COMMIT
+            env.GIT_BRANCH_NAME = scmVars.GIT_BRANCH
+
+            echo "GIT_COMMIT = ${env.GIT_SHA}"
+            echo "GIT_BRANCH = ${env.GIT_BRANCH_NAME}"
 
             githubNotify(
                 credentialsId: 'github-pat',
                 account: 'AmarGmail',
                 repo: 'jenkins-scripted-demo',
                 status: 'PENDING',
-                sha: scmVars.GIT_COMMIT,
+                sha: env.GIT_SHA,
                 description: "Build #${env.BUILD_NUMBER} started",
                 context: 'ci/jenkins'
             )
@@ -79,7 +82,7 @@ node {
                 account: 'AmarGmail',
                 repo: 'jenkins-scripted-demo',
                 status: 'SUCCESS',
-                sha: scmVars.GIT_COMMIT,
+                sha: env.GIT_SHA,
                 description: "Build #${env.BUILD_NUMBER} passed",
                 context: 'ci/jenkins'
             )
@@ -93,7 +96,7 @@ node {
             account: 'AmarGmail',
             repo: 'jenkins-scripted-demo',
             status: 'FAILURE',
-            sha: scmVars.GIT_COMMIT,
+            sha: env.GIT_SHA,
             description: "Build #${env.BUILD_NUMBER} failed",
             context: 'ci/jenkins'
         )
