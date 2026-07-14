@@ -1,112 +1,72 @@
+timestamps{
+    node {
+        try{
+            stage('Checkout'){
+                echo "Checkout the Git code...."
+                checkout scm
 
-timestamps {
-node {
-    try {
-        stage('Checkout') {
-            echo "Checking out the code .."
-            def scmVars = checkout scm
-            echo "scmVars:  ${scmVars}"
-            //checkout scm
-            env.GIT_SHA = scmVars.GIT_COMMIT
-            env.GIT_BRANCH_NAME = scmVars.GIT_BRANCH
-
-            echo "GIT_COMMIT = ${env.GIT_SHA}"
-            echo "GIT_BRANCH = ${env.GIT_BRANCH_NAME}"
-
-            githubNotify(
-                credentialsId: 'github-pat',
-                account: 'AmarGmail',
-                repo: 'jenkins-scripted-demo',
-                status: 'PENDING',
-                sha: env.GIT_SHA,
-                description: "Build #${env.BUILD_NUMBER} started",
-                context: 'ci/jenkins'
-            )
-        }
-        stage('Show Files') {
-            echo "Displaying the files..."
-            if(isUnix()) {
-                sh 'ls -l'
-            } else {
-                bat 'dir'
+                githubNotify(
+                    credentialsId: 'github-pat',
+                    status: 'PENDING',
+                    description: 'build started'
+                )
             }
-        }   
-        stage('Create python virtual environment') {
-            echo "Createing python venv..."
-            if (isUnix()) {
-                //sh '''
-                //python3 -m venv venv
-                //./venv/bin/python -m pip install --upgrade pip
-                //'''
-                sh 'python3 -m venv venv'
-            } else {
-                //bat '''
-                //python -m venv venv
-                //.\\venv\\Scripts\\python.exe -m pip install --upgrade pip
-                //'''
-                bat 'python -m venv venv'
-            }
-        }
-        stage('Install Dependencies') {
-            echo "Install Python Dependencies...."
-            if (isUnix()) {
-                sh './venv/bin/python -m pip install -r requirements.txt'
-            } else {
-                bat '.\\venv\\Scripts\\python.exe -m pip install -r requirements.txt'
-            }
-        }
-        stage('Run Application') {
-            echo "Running the Python Application"
-            if (isUnix()) {
-                sh './venv/bin/python app.py'
-            } else {
-                bat '.\\venv\\Scripts\\python.exe app.py'
-            }
-        }
-        stage('Run Test Cases') {
-            echo "Running the Automated Test..."
-            if (isUnix()) {
-                sh './venv/bin/pytest -v --junitxml=test-results.xml'
-            } else {
-                bat '.\\venv\\Scripts\\pytest -v --junitxml=test-results.xml'
-            }
-        }
-        stage('Publish the Test Results'){
-            junit 'test-results.xml'
-        }
-        stage('Build Result') {
-            echo "Application Build and Test completed successfully"
+            stage('Show Files'){
+                echo "Displaying the files..."
+                if (isUnix()){
+                    sh 'ls -l'
+                } else {
+                    bat 'dir'
+                }
 
-            githubNotify(
-                credentialsId: 'github-pat',
-                account: 'AmarGmail',
-                repo: 'jenkins-scripted-demo',
-                status: 'SUCCESS',
-                sha: env.GIT_SHA,
-                description: "Build #${env.BUILD_NUMBER} passed",
-                context: 'ci/jenkins'
-            )
+            }
+            stage('Create Python Virtual Environment'){
+                echo "Creating python venv..."
+                if (isUnix()) {
+                    sh 'python3 -m venv venv'
+                } else {
+                    bat 'python -m venv venv'
+                }
+            }
+            stage('Install Dependencies'){
+                echo "Install Python Dependencies..."
+                if (isUnix()) {
+                    sh './venv/bin/python -m pip install -r requirements.txt'
+                } else {
+                    bat '.\\venv\\Scripts\\python.exe -m pip install -r requirements.txt'
+                }
+            }
+            stage('Run Application'){
+                echo "Running Python Application..."
+                if (isUnix()) {
+                    sh './venv/bin/python app.py'
+                } else {
+                    bat './venv/bin/python app.py'
+                }
+            }
+            stage('Run Unit Test Cases'){
+                echp "Running Automated Test Cases..."
+                if (isUnix()) {
+                    sh './venv/bin/pytest -v --junitxml=test-results.xml'
+                } else {
+                    bat '.\\venv\\Scripts\\pytest -v --junitxml=test-results.xml'
+                }
+
+            }
+            stage('Publish The Test Results'){
+                echo "JUNIT Test Results..."
+                junit 'test-results.xml'
+            }
+            stage('success'){
+                echo "The pipeline completed successfully."
+
+            }
+        } catch (Exception e) {
+            currentBuild.result = 'FAILURE'
+            throw e
+        } finally {
+            echo "Cleaning the workspace..."
+            deleteDir()
         }
-
-    } catch (Exception e) {
-        echo "An error occurred: ${e.getMessage()}"
-        currentBuild.result = 'FAILURE'
-        githubNotify(
-            credentialsId: 'github-pat',
-            account: 'AmarGmail',
-            repo: 'jenkins-scripted-demo',
-            status: 'FAILURE',
-            sha: env.GIT_SHA,
-            description: "Build #${env.BUILD_NUMBER} failed",
-            context: 'ci/jenkins'
-        )
-
-throw e
-    }
-    finally {
-        echo "Cleaning the workspace...."
-        //cleanWs()
-        deleteDir()
-    }
-}
+    } 
 }
